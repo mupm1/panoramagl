@@ -41,10 +41,6 @@ public interface PLIView {
 
     boolean reset(boolean resetCamera);
 
-    /**
-     * property methods
-     */
-
     PLIPanorama getPanorama();
 
     void setPanorama(PLIPanorama panorama);
@@ -231,4 +227,11 @@ public interface PLIView {
     boolean isZoomEnabled();
 
     void setZoomEnabled(boolean enabled);
+
+    /**
+     * accelerated touch scrolling
+     **/
+    boolean isAcceleratedTouchScrollingEnabled();
+
+    void setAcceleratedTouchScrollingEnabled(boolean enabled);
 }
