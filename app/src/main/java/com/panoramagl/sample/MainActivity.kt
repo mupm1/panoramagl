@@ -2,6 +2,9 @@ package com.panoramagl.sample
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.view.MotionEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -23,13 +26,16 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
     private val resourceIds = intArrayOf(R.raw.sighisoara_sphere, R.raw.sighisoara_sphere_2)
 
     private val useAcceleratedTouchScrolling = false
+    val handler = Handler(Looper.getMainLooper())
+    var count = 0
+    private lateinit var panorama: PLSphericalPanorama
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-
+        panorama = PLSphericalPanorama()
         plManager = PLManager(this).apply {
             setContentView(binding.contentView)
             onCreate()
@@ -38,9 +44,25 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
             isZoomEnabled = false
             isAcceleratedTouchScrollingEnabled = useAcceleratedTouchScrolling
         }
+
+        plManager.panorama = panorama
+
         changePanorama(0)
+
         binding.button1.setOnClickListener { changePanorama(0) }
         binding.button2.setOnClickListener { changePanorama(1) }
+        play()
+    }
+
+    private fun play() {
+        handler.postDelayed({
+            onClick(100)
+            Log.i("onClick", "$count")
+            count++
+            if (count < 100) {
+                play()
+            }
+        }, 1000)
     }
 
     override fun onResume() {
@@ -66,11 +88,9 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
         if (currentIndex == index)
             return
         val image3D = PLUtils.getBitmap(this, resourceIds[index])
-        val panorama = PLSphericalPanorama()
+        //val image3D = BitmapFactory.decodeResource(resources,resourceIds[index])
         panorama.setImage(PLImage(image3D, false))
-        var pitch = 5f
-        var yaw = 0f
-        var zoomFactor = 0.7f
+
         if (currentIndex != -1) {
             plManager.panorama.camera?.apply {
                 pitch = this.pitch
@@ -91,31 +111,32 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
             PLConstants.kDefaultHotspotSize,
             PLConstants.kDefaultHotspotSize
         )
-        plHotspot1.setPosition(normalizedX, normalizedY)
+        //plHotspot1.setPosition(normalizedX, normalizedY)
         val plHotspot2 = ActionPLHotspot(
             this,
             hotSpotId + 1,
             PLImage(BitmapFactory.decodeResource(resources, R.raw.hotspot)),
-            20f,
-            50f,
+            180f,
+            0f,
             PLConstants.kDefaultHotspotSize,
             PLConstants.kDefaultHotspotSize
         )
         panorama.addHotspot(plHotspot1)
         panorama.addHotspot(plHotspot2)
-        panorama.camera.lookAtAndZoomFactor(pitch, yaw, zoomFactor, false)
-        if (!useAcceleratedTouchScrolling) {
-            // If not using the accelerated scrolling, increasing the camera's rotation sensitivity will allow the
-            // image to pan faster with finger movement. 180f gives about a ~1:1 move sensitivity.
-            // Higher will move the map faster
-            // Range 1-270
-            panorama.camera.rotationSensitivity = 270f
-        }
-        plManager.panorama = panorama
+
+
         currentIndex = index
     }
 
+    var pos = 0
     override fun onClick(identifier: Long) {
-        runOnUiThread { Toast.makeText(this@MainActivity, "HotSpotClicked! Id is-> $identifier", Toast.LENGTH_SHORT).show() }
+        runOnUiThread {
+            pos = if (pos == 1) {
+                0
+            } else {
+                1
+            }
+            changePanorama(pos)
+        }
     }
 }
