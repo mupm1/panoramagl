@@ -88,17 +88,7 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
         if (currentIndex == index)
             return
         val image3D = PLUtils.getBitmap(this, resourceIds[index])
-        //val image3D = BitmapFactory.decodeResource(resources,resourceIds[index])
-        if (pl?.isRecycled == false){
-            pl?.recycle()
-        }
         pl= PLImage(image3D, false)
-        panorama.releaseView()
-        panorama.removeAllElements()
-        panorama.removeAllTextures()
-        panorama.removeAllHotspots()
-        panorama.removeAllPreviewTextures()
-        panorama.clear()
         panorama.setImage(pl)
 
         if (currentIndex != -1) {
