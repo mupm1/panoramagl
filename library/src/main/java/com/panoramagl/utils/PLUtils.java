@@ -28,6 +28,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 import com.panoramagl.enumerations.PLTextureColorFormat;
 
@@ -41,7 +42,7 @@ import java.nio.IntBuffer;
 
 public class PLUtils {
 
-    private static int sAndroidVersion = 0;
+    private static float sAndroidVersion = 0.0f;
 
     public static IntBuffer makeIntBuffer(int[] array) {
         final int integerSize = Integer.SIZE / 8;
@@ -218,16 +219,17 @@ public class PLUtils {
         return (displayMetrics.xdpi + displayMetrics.ydpi) / 2.0f;
     }
 
-    public static int getAndroidVersion() {
-        if (sAndroidVersion == 0) {
+    public static float getAndroidVersion() {
+        if (sAndroidVersion == 0.0f) {
             String androidVersion = Build.VERSION.RELEASE.trim();
-            try {
-                int firstDotPosition = androidVersion.indexOf('.'), secondDotPosition = androidVersion.indexOf('.', firstDotPosition + 1);
-                sAndroidVersion = Integer.parseInt(androidVersion.substring(0, secondDotPosition != -1 && secondDotPosition < 6 ? secondDotPosition : firstDotPosition));
-            } catch (Throwable e) {
-                sAndroidVersion = Integer.parseInt(androidVersion);
+            String[] arr = androidVersion.split("\\.");
+            Log.i("getAndroidVersion", "androidVersion: " + androidVersion);
+            sAndroidVersion = Float.parseFloat(arr[0]);
+            if (arr.length > 1) {
+                sAndroidVersion = Float.parseFloat(arr[0] + arr[1]);
             }
         }
+        Log.i("getAndroidVersion", "sAndroidVersion: " + sAndroidVersion);
         return sAndroidVersion;
     }
 
