@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.3.5
         with:
           fetch-depth: 0
       - name: Install JDK ${{ matrix.java_version }}
@@ -22,7 +22,7 @@ jobs:
       - name: Install Android SDK
         uses: malinskiy/action-android/install-sdk@release/0.1.2
       - name: Build project
-        run: ./gradlew clean build
+        run: ./gradlew assembleRelease
         env:
           VERSION: ${{ github.ref }}
       - run: |

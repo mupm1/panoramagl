@@ -1,15 +1,15 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'maven-publish'
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'maven-publish'
+}
 
 android {
-    compileSdkVersion 30
-    ndkVersion '21.3.6528147'
+    compileSdkVersion 31
+
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 30
-        versionCode 4
-        versionName "1.1"
+        targetSdkVersion 31
     }
 
     externalNativeBuild {
@@ -24,10 +24,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
+
 }
 
 dependencies {
