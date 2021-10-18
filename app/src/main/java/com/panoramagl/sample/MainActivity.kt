@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
 
     private fun play() {
         handler.postDelayed({
-            onClick(100)
+            onChange(100)
             Log.i("onClick", "$count")
             count++
             if (count < 100) {
@@ -83,12 +83,13 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
     override fun onTouchEvent(event: MotionEvent): Boolean {
         return plManager.onTouchEvent(event)
     }
-    var pl : PLImage? =null
+
+    var pl: PLImage? = null
     private fun changePanorama(index: Int) {
         if (currentIndex == index)
             return
         val image3D = PLUtils.getBitmap(this, resourceIds[index])
-        pl= PLImage(image3D, false)
+        pl = PLImage(image3D, false)
         panorama.setImage(pl)
 
         if (currentIndex != -1) {
@@ -129,7 +130,7 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
     }
 
     var pos = 0
-    override fun onClick(identifier: Long) {
+    fun onChange(identifier: Long) {
         runOnUiThread {
             pos = if (pos == 1) {
                 0
@@ -137,6 +138,12 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
                 1
             }
             changePanorama(pos)
+        }
+    }
+
+    override fun onClick(identifier: Long) {
+        runOnUiThread {
+            Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show()
         }
     }
 }
