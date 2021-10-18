@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
     private val useAcceleratedTouchScrolling = false
     val handler = Handler(Looper.getMainLooper())
     var count = 0
+    var MAX_COUNT = 400
     private lateinit var panorama: PLSphericalPanorama
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,9 +66,9 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
             val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
             activityManager.getMemoryInfo(mi)
             val availableMegs: Long = mi.availMem / 0x100000L
-            binding.txt.text = "Count $count/100 ♦ Available Memory $availableMegs MB"
+            binding.txt.text = "Count $count/$MAX_COUNT ♦ Available Memory $availableMegs MB"
             count++
-            if (count <= 100) {
+            if (count <= MAX_COUNT) {
                 play()
             }
         }, 1000)
