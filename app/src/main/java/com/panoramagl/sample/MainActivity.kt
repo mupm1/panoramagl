@@ -41,12 +41,16 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
         plManager = PLManager(this).apply {
             setContentView(binding.contentView)
             onCreate()
-            isAccelerometerEnabled = false
-            isInertiaEnabled = false
-            isZoomEnabled = false
-            isAcceleratedTouchScrollingEnabled = useAcceleratedTouchScrolling
         }
-
+        plManager.accelerometerSensitivity = 5f
+        plManager.isInertiaEnabled = false
+        plManager.isScrollingEnabled = false
+        plManager.isResetEnabled = false
+        plManager.isScrollingEnabled = false
+        plManager.isZoomEnabled = true
+        panorama.camera.fov = 55.0f
+        panorama.camera.setFovRange(40.0f, 110.0f)
+        panorama.camera.isReverseRotation = true
         plManager.panorama = panorama
 
         changePanorama(0)
