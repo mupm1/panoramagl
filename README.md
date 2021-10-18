@@ -1,4 +1,4 @@
-[![](https://jitpack.io/v/hannesa2/panoramagl.svg)](https://jitpack.io/#hannesa2/panoramagl)
+[![](https://jitpack.io/v/mupm1/panoramagl.svg)](https://jitpack.io/#mupm1/panoramagl)
 
 
 # PanoramaGL Android
@@ -35,7 +35,7 @@ allprojects {
 
 ```	
 dependencies {
-    implementation 'com.github.hannesa2:panoramagl:$latestVersion'
+    implementation 'com.github.mupm1:panoramagl:$latestVersion'
 }
 ```
 
