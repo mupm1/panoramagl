@@ -16,6 +16,8 @@ import com.panoramagl.hotspots.ActionPLHotspot
 import com.panoramagl.hotspots.HotSpotListener
 import com.panoramagl.sample.databinding.ActivityMainBinding
 import com.panoramagl.utils.PLUtils
+import android.app.ActivityManager
+
 
 class MainActivity : AppCompatActivity(), HotSpotListener {
 
@@ -49,17 +51,19 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
 
         changePanorama(0)
 
-        binding.button1.setOnClickListener { changePanorama(0) }
-        binding.button2.setOnClickListener { changePanorama(1) }
         play()
     }
 
     private fun play() {
         handler.postDelayed({
             onChange(100)
-            Log.i("onClick", "$count")
+            val mi = ActivityManager.MemoryInfo()
+            val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+            activityManager.getMemoryInfo(mi)
+            val availableMegs: Long = mi.availMem / 0x100000L
+            binding.txt.text = "Count $count/100 ♦ Available Memory $availableMegs MB"
             count++
-            if (count < 100) {
+            if (count <= 100) {
                 play()
             }
         }, 1000)
