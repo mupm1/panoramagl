@@ -77,6 +77,14 @@ public interface PLIView {
 
     boolean isValidForFov();
 
+    boolean isSensorialRotationLeftRightEnabled();
+
+    void setSensorialRotationLeftRightEnabled(boolean isSensorialRotationLeftRightEnabled);
+
+    boolean isSensorialRotationUpDownEnabled();
+
+    void setSensorialRotationUpDownEnabled(boolean isSensorialRotationUpDownEnabled);
+
     boolean isAccelerometerEnabled();
 
     void setAccelerometerEnabled(boolean isAccelerometerEnabled);

@@ -87,6 +87,8 @@ open class PLManager(private val context: Context) : PLIView, SensorEventListene
     private var mSensorialRotationAccelerometerData: FloatArray? = null
     private var mSensorialRotationRotationMatrix: FloatArray? = null
     private var mSensorialRotationOrientationData: FloatArray? = null
+    private var mIsSensorialRotationLeftRightEnabled = true
+    private var mIsSensorialRotationUpDownEnabled = true
     private var mHasFirstGyroscopePitch = false
     private var mHasFirstAccelerometerPitch = false
     private var mHasFirstMagneticHeading = false
@@ -340,6 +342,22 @@ open class PLManager(private val context: Context) : PLIView, SensorEventListene
         mIsValidForFov = isValidForFov
     }
 
+    override fun isSensorialRotationLeftRightEnabled(): Boolean {
+        return mIsSensorialRotationLeftRightEnabled
+    }
+
+    override fun setSensorialRotationLeftRightEnabled(isSensorialRotationLeftRightEnabled: Boolean) {
+        mIsSensorialRotationLeftRightEnabled = isSensorialRotationLeftRightEnabled
+    }
+
+    override fun isSensorialRotationUpDownEnabled(): Boolean {
+        return mIsSensorialRotationUpDownEnabled
+    }
+
+    override fun setSensorialRotationUpDownEnabled(isSensorialRotationUpDownEnabled: Boolean) {
+        mIsSensorialRotationUpDownEnabled = isSensorialRotationUpDownEnabled
+    }
+
     override fun isAccelerometerEnabled(): Boolean {
         return mIsAccelerometerEnabled
     }
@@ -347,6 +365,7 @@ open class PLManager(private val context: Context) : PLIView, SensorEventListene
     override fun setAccelerometerEnabled(isAccelerometerEnabled: Boolean) {
         mIsAccelerometerEnabled = isAccelerometerEnabled
     }
+
 
     override fun isAccelerometerLeftRightEnabled(): Boolean {
         return mIsAccelerometerLeftRightEnabled
@@ -976,8 +995,17 @@ open class PLManager(private val context: Context) : PLIView, SensorEventListene
     }
 
     protected fun doGyroUpdate(pitch: Float, yaw: Float) {
+        var finalPitch = pitch
+        var finalYaw = yaw
         if (this.isLocked || mIsValidForTouch || mIsValidForScrolling || isValidForCameraAnimation || mIsValidForTransition || !mHasFirstGyroscopePitch) return
-        mPanorama!!.camera.lookAt(this, pitch, yaw)
+        val cameraRotation = mPanorama!!.camera.lookAtRotation
+        if (!mIsSensorialRotationUpDownEnabled) {
+            finalPitch = cameraRotation!!.pitch
+        }
+        if (!mIsSensorialRotationLeftRightEnabled) {
+            finalYaw = cameraRotation!!.yaw
+        }
+        mPanorama!!.camera.lookAt(this, finalPitch, finalYaw)
     }
 
     protected fun doSimulatedGyroUpdate() {
