@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
 
     private lateinit var plManager: PLManager
     private var currentIndex = -1
+    private var sensor = false
     private val resourceIds = intArrayOf(R.raw.sighisoara_sphere, R.raw.sighisoara_sphere_2)
 
     private val useAcceleratedTouchScrolling = false
@@ -39,6 +40,16 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
             isAcceleratedTouchScrollingEnabled = useAcceleratedTouchScrolling
         }
         changePanorama(0)
+        binding.button3.setOnClickListener {
+            if (sensor) {
+                plManager.stopSensorialRotation()
+            } else {
+                plManager.startSensorialRotation()
+            }
+            plManager.isSensorialRotationLeftRightEnabled=false
+            plManager.isSensorialRotationUpDownEnabled=true
+            sensor = !sensor
+        }
         binding.button1.setOnClickListener { changePanorama(0) }
         binding.button2.setOnClickListener { changePanorama(1) }
     }

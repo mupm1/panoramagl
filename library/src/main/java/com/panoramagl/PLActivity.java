@@ -94,8 +94,9 @@ public class PLActivity extends AppCompatActivity implements PLIView, SensorEven
     private boolean mIsValidForFov;
     private float mFovDistance;
     private int mFovCounter;
-
     private boolean mIsAccelerometerEnabled, mIsAccelerometerLeftRightEnabled, mIsAccelerometerUpDownEnabled;
+    private boolean mIsSensorialRotationLeftRightEnabled = true;
+    private boolean mIsSensorialRotationUpDownEnabled = true;
     private float mAccelerometerInterval, mAccelerometerSensitivity;
 
     private boolean mIsValidForSensorialRotation;
@@ -420,6 +421,26 @@ public class PLActivity extends AppCompatActivity implements PLIView, SensorEven
     @Override
     public boolean isValidForFov() {
         return mIsValidForFov;
+    }
+
+    @Override
+    public boolean isSensorialRotationLeftRightEnabled() {
+        return mIsAccelerometerLeftRightEnabled;
+    }
+
+    @Override
+    public void setSensorialRotationLeftRightEnabled(boolean isSensorialRotationLeftRightEnabled) {
+        mIsAccelerometerLeftRightEnabled = isSensorialRotationLeftRightEnabled;
+    }
+
+    @Override
+    public boolean isSensorialRotationUpDownEnabled() {
+        return mIsAccelerometerUpDownEnabled;
+    }
+
+    @Override
+    public void setSensorialRotationUpDownEnabled(boolean isSensorialRotationUpDownEnabled) {
+        mIsAccelerometerUpDownEnabled = isSensorialRotationUpDownEnabled;
     }
 
     protected void setValidForFov(boolean isValidForFov) {
@@ -1186,6 +1207,13 @@ public class PLActivity extends AppCompatActivity implements PLIView, SensorEven
         if (this.isLocked() || mIsValidForTouch || mIsValidForScrolling || mIsValidForCameraAnimation || mIsValidForTransition || !mHasFirstGyroscopePitch)
             return;
 
+        PLRotation cameraRotation = mPanorama.getCamera().getLookAtRotation();
+        if (!mIsSensorialRotationUpDownEnabled && cameraRotation != null) {
+            pitch = cameraRotation.pitch;
+        }
+        if (!mIsSensorialRotationLeftRightEnabled && cameraRotation != null) {
+            yaw = cameraRotation.yaw;
+        }
         mPanorama.getCamera().lookAt(this, pitch, yaw);
     }
 
