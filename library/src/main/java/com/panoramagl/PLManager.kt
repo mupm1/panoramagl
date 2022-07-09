@@ -33,6 +33,7 @@ import android.opengl.GLSurfaceView
 import android.os.Handler
 import android.os.Looper
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.widget.RelativeLayout
@@ -828,8 +829,13 @@ open class PLManager(private val context: Context) : PLIView, SensorEventListene
         var interval = mInertiaInterval / PLMath.distanceBetweenPoints(mStartPoint, mEndPoint)
         if (interval < 0.01f) {
             mInertiaStepValue = 0.01f / interval
-            interval = 0.01f
-        } else mInertiaStepValue = 1.0f
+        }else{
+            mInertiaStepValue = 1f
+        }
+        /*  if (mInertiaTimer != null) {
+              mInertiaTimer!!.invalidate()
+              mInertiaTimer = null
+          }*/
         mInertiaTimer = NSTimer.scheduledTimerWithTimeInterval(
             interval,
             { target, userInfo -> inertia() },
@@ -843,9 +849,10 @@ open class PLManager(private val context: Context) : PLIView, SensorEventListene
         if (this.isLocked || isValidForCameraAnimation || mIsValidForTransition) return
         val m = (mEndPoint!!.y - mStartPoint!!.y) / (mEndPoint!!.x - mStartPoint!!.x)
         val b = (mStartPoint!!.y * mEndPoint!!.x - mEndPoint!!.y * mStartPoint!!.x) / (mEndPoint!!.x - mStartPoint!!.x)
-        val x: Float
-        val y: Float
+        var x: Float
+        var y: Float
         val add: Float
+
         if (Math.abs(mEndPoint!!.x - mStartPoint!!.x) >= Math.abs(mEndPoint!!.y - mStartPoint!!.y)) {
             add = if (mEndPoint!!.x > mStartPoint!!.x) -mInertiaStepValue else mInertiaStepValue
             x = mEndPoint!!.x + add
@@ -863,8 +870,10 @@ open class PLManager(private val context: Context) : PLIView, SensorEventListene
             }
             x = (y - b) / m
         }
-        mEndPoint!!.setValues(x, y)
-        if (mListener != null) mListener!!.onDidRunInertia(this, mStartPoint, mEndPoint)
+        if (!x.isNaN() && !x.isInfinite() && !y.isNaN() && !y.isInfinite()) {
+            mEndPoint!!.setValues(x, y)
+            if (mListener != null) mListener!!.onDidRunInertia(this, mStartPoint, mEndPoint)
+        }
     }
 
     protected fun stopInertia(): Boolean {

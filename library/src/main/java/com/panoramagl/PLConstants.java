@@ -215,13 +215,13 @@ public class PLConstants {
      * scrolling constants
      */
 
-    public static final int kDefaultMinDistanceToEnableScrolling = 30;
+    public static final int kDefaultMinDistanceToEnableScrolling = 0;
 
     /**
      * drawing constants
      */
 
-    public static final int kDefaultMinDistanceToEnableDrawing = 10;
+    public static final int kDefaultMinDistanceToEnableDrawing = 0;
 
     /**
      * shake constants
