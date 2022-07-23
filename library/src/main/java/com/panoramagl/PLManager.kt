@@ -780,7 +780,7 @@ open class PLManager(private val context: Context) : PLIView, SensorEventListene
                 if (mIsScrollingEnabled && isNotCancelable) {
                     val isValidForMoving = PLMath.distanceBetweenPoints(mStartPoint, mEndPoint) >= mMinDistanceToEnableScrolling
                     if (mIsInertiaEnabled) {
-                        if (isValidForMoving) {
+                        if (isValidForMoving ||!mStartPoint!!.equals(mEndPoint)) {
                             mIsValidForScrolling = true
                             isNotCancelable = true
                             if (listenerExists) {
