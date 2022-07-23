@@ -18,6 +18,8 @@
 
 package com.panoramagl;
 
+import android.util.Log;
+
 import com.panoramagl.computation.PLMath;
 import com.panoramagl.enumerations.PLCameraAnimationType;
 import com.panoramagl.ios.NSTimer;
@@ -38,6 +40,8 @@ public class PLCamera extends PLRenderableElementBase implements PLICamera {
     private PLRange mFovRange;
     private int mMinDistanceToEnableFov;
     private float mRotationSensitivity, mRotationSensitivityByDisplayPPI;
+    private boolean rotationSensitivityFactorInZoomScaleEnable;
+    private float rotationSensitivityFactorInZoomScale;
     private int mZoomLevels;
     private PLRotation mInitialLookAt, mLookAtRotation;
     private boolean mIsAnimating;
@@ -259,8 +263,13 @@ public class PLCamera extends PLRenderableElementBase implements PLICamera {
 
     @Override
     public void setRotationSensitivity(float rotationSensitivity) {
-        if (mIsNotLocked && rotationSensitivity >= PLConstants.kRotationSensitivityMinValue && rotationSensitivity <= PLConstants.kRotationSensitivityMaxValue)
+        if (mIsNotLocked && rotationSensitivity >= PLConstants.kRotationSensitivityMinValue && rotationSensitivity <= PLConstants.kRotationSensitivityMaxValue) {
             this.setInternalRotationSensitivity(rotationSensitivity);
+        } else if (rotationSensitivity < PLConstants.kRotationSensitivityMinValue) {
+            this.setInternalRotationSensitivity(PLConstants.kRotationSensitivityMinValue);
+        } else if (rotationSensitivity > PLConstants.kRotationSensitivityMaxValue) {
+            this.setInternalRotationSensitivity(PLConstants.kRotationSensitivityMaxValue);
+        }
     }
 
     protected void setInternalRotationSensitivity(float rotationSensitivity) {
@@ -850,7 +859,12 @@ public class PLCamera extends PLRenderableElementBase implements PLICamera {
             float yOffset = endPoint.y - startPoint.y, xOffset = startPoint.x - endPoint.x;
             boolean didRotatePitch = (yOffset != 0.0f), didRotateYaw = (xOffset != 0.0f);
             if (didRotatePitch || didRotateYaw) {
-                float rotationSensitivity = mFov / PLConstants.kFovBaseline * mRotationSensitivityByDisplayPPI;
+                float zoomRotateScale = 1;
+                if (rotationSensitivityFactorInZoomScaleEnable && rotationSensitivityFactorInZoomScale > 0) {
+                    zoomRotateScale = getZoomFactor() + rotationSensitivityFactorInZoomScale;
+                }
+                float rotationSensitivity = (mFov / PLConstants.kFovBaseline * mRotationSensitivityByDisplayPPI) * zoomRotateScale;
+                Log.i("rotationSensitivity", "zoomRotateScale :" + zoomRotateScale + " | rotationSensitivity :" + rotationSensitivity);
                 if (didRotatePitch)
                     this.setPitch(this.getPitch() + ((yOffset / PLConstants.kMaxDisplaySize * rotationSensitivity)));
                 if (didRotateYaw)
@@ -906,6 +920,8 @@ public class PLCamera extends PLRenderableElementBase implements PLICamera {
                 this.setFovEnabled(camera.isFovEnabled());
                 this.setInternalFov(null, camera.getFov(), true, false, false);
                 this.setRotationSensitivity(camera.getRotationSensitivity());
+                this.setRotationSensitivityFactorInZoomScaleEnable(camera.getRotationSensitivityFactorInZoomScaleEnable());
+                this.setRotationSensitivityFactorInZoomScale(camera.getRotationSensitivityFactorInZoomScale());
                 this.setZoomLevels(camera.getZoomLevels());
                 this.setInitialLookAt(camera.getInitialLookAt());
                 this.setListener(camera.getListener());
@@ -931,6 +947,26 @@ public class PLCamera extends PLRenderableElementBase implements PLICamera {
         mFovRange = null;
         mInternalListener = mListener = null;
         super.finalize();
+    }
+
+    @Override
+    public void setRotationSensitivityFactorInZoomScaleEnable(boolean rotationSensitivityFactorInZoomScaleEnable) {
+        this.rotationSensitivityFactorInZoomScaleEnable = rotationSensitivityFactorInZoomScaleEnable;
+    }
+
+    @Override
+    public void setRotationSensitivityFactorInZoomScale(float rotationSensitivityFactorInZoomScale) {
+        this.rotationSensitivityFactorInZoomScale = rotationSensitivityFactorInZoomScale;
+    }
+
+    @Override
+    public boolean getRotationSensitivityFactorInZoomScaleEnable() {
+        return rotationSensitivityFactorInZoomScaleEnable;
+    }
+
+    @Override
+    public float getRotationSensitivityFactorInZoomScale() {
+        return rotationSensitivityFactorInZoomScale;
     }
 
     /**

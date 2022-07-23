@@ -18,6 +18,8 @@ interface PLICamera : PLIRenderableElement {
     var fovMax: Float
     var minDistanceToEnableFov: Int
     var rotationSensitivity: Float
+    var rotationSensitivityFactorInZoomScaleEnable: Boolean
+    var rotationSensitivityFactorInZoomScale: Float
     var zoomFactor: Float
     var zoomLevel: Int
     var zoomLevels: Int

@@ -459,6 +459,14 @@ public class PLJSONLoader extends PLLoaderBase {
                     currentCamera.setRotationSensitivity(oldCamera.getRotationSensitivity());
                 else if (camera.has("rotationSensitivity"))
                     currentCamera.setRotationSensitivity((float) camera.getDouble("rotationSensitivity"));
+                if (keep.rotationSensitivityInZoomScale)
+                    currentCamera.setRotationSensitivityFactorInZoomScale(oldCamera.getRotationSensitivityFactorInZoomScale());
+                else if (camera.has("rotationSensitivityFactorInZoomScale"))
+                    currentCamera.setRotationSensitivityFactorInZoomScale((float) camera.getDouble("rotationSensitivityFactorInZoomScale"));
+                if (keep.rotationSensitivityInZoomScaleEnable)
+                    currentCamera.setRotationSensitivityFactorInZoomScaleEnable(oldCamera.getRotationSensitivityFactorInZoomScaleEnable());
+                else if (camera.has("rotationSensitivityFactorInZoomScaleEnable"))
+                    currentCamera.setRotationSensitivityFactorInZoomScaleEnable(camera.getBoolean("rotationSensitivityFactorInZoomScaleEnable"));
                 if (mInitialPitch != PLConstants.kFloatUndefinedValue)
                     pitch = mInitialPitch;
                 else if (keep.vLookAt)

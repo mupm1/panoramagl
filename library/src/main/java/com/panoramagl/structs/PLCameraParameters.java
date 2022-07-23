@@ -24,6 +24,8 @@ public class PLCameraParameters implements PLIStruct<PLCameraParameters> {
      */
 
     public boolean atvMin, atvMax, athMin, athMax, reverseRotation, rotationSensitivity, vLookAt, hLookAt;
+    public boolean rotationSensitivityInZoomScaleEnable;
+    public boolean rotationSensitivityInZoomScale;
     public boolean zoomLevels, fovMin, fovMax, fovSensitivity, fov;
 
     /**
@@ -76,6 +78,8 @@ public class PLCameraParameters implements PLIStruct<PLCameraParameters> {
         athMax = parameters.athMax;
         reverseRotation = parameters.reverseRotation;
         rotationSensitivity = parameters.rotationSensitivity;
+        rotationSensitivityInZoomScaleEnable = parameters.rotationSensitivityInZoomScaleEnable;
+        rotationSensitivityInZoomScale = parameters.rotationSensitivityInZoomScale;
         vLookAt = parameters.vLookAt;
         hLookAt = parameters.hLookAt;
         zoomLevels = parameters.zoomLevels;
@@ -113,6 +117,8 @@ public class PLCameraParameters implements PLIStruct<PLCameraParameters> {
                                     athMax == parameters.athMax &&
                                     reverseRotation == parameters.reverseRotation &&
                                     rotationSensitivity == parameters.rotationSensitivity &&
+                                    rotationSensitivityInZoomScale == parameters.rotationSensitivityInZoomScale &&
+                                    rotationSensitivityInZoomScaleEnable == parameters.rotationSensitivityInZoomScaleEnable &&
                                     vLookAt == parameters.vLookAt &&
                                     hLookAt == parameters.hLookAt &&
                                     zoomLevels == parameters.zoomLevels &&
