@@ -722,14 +722,14 @@ open class PLManager(private val context: Context) : PLIView, SensorEventListene
         }
         mIsValidForTouch = true
         mTouchStatus = PLTouchStatus.PLTouchStatusBegan
-        if (!executeDefaultAction(touches, PLTouchEventType.PLTouchEventTypeBegan)) {
-            mEndPoint!!.setValues(mStartPoint!!.setValues(getLocationOfFirstTouch(touches)))
-            if (touches[0]!!.tapCount == 1) {
-                mTouchStatus = PLTouchStatus.PLTouchStatusFirstSingleTapCount
-                if (renderer != null && renderer!!.isRunning && mPanorama != null) mPanorama!!.waitingForClick = true
-                mTouchStatus = PLTouchStatus.PLTouchStatusSingleTapCount
-            }
-        }
+       if (!executeDefaultAction(touches, PLTouchEventType.PLTouchEventTypeBegan)) {
+           if (touches[0]!!.tapCount == 1) {
+               mEndPoint!!.setValues(mStartPoint!!.setValues(getLocationOfFirstTouch(touches)))
+               mTouchStatus = PLTouchStatus.PLTouchStatusFirstSingleTapCount
+               if (renderer != null && renderer!!.isRunning && mPanorama != null) mPanorama!!.waitingForClick = true
+               mTouchStatus = PLTouchStatus.PLTouchStatusSingleTapCount
+           }
+       }
         if (listenerExists) mListener!!.onDidBeginTouching(this, touches, event)
     }
 
@@ -899,7 +899,7 @@ open class PLManager(private val context: Context) : PLIView, SensorEventListene
         if (sensorManager != null && sensorManager!!.registerListener(
                 this,
                 sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                (mAccelerometerInterval * 1000.0f).toInt()
+                SensorManager.SENSOR_DELAY_GAME
             )
         ) return true
         PLLog.debug("PLView::activateAccelerometer", "Accelerometer sensor is not available on the device!")

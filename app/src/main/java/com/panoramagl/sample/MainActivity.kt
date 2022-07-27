@@ -2,16 +2,19 @@ package com.panoramagl.sample
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.panoramagl.PLConstants
-import com.panoramagl.PLImage
-import com.panoramagl.PLManager
-import com.panoramagl.PLSphericalPanorama
+import com.panoramagl.*
 import com.panoramagl.hotspots.ActionPLHotspot
 import com.panoramagl.hotspots.HotSpotListener
+import com.panoramagl.hotspots.PLIHotspot
+import com.panoramagl.ios.UITouch
+import com.panoramagl.ios.structs.CGPoint
 import com.panoramagl.sample.databinding.ActivityMainBinding
+import com.panoramagl.structs.PLPosition
+import com.panoramagl.transitions.PLITransition
 import com.panoramagl.utils.PLUtils
 
 class MainActivity : AppCompatActivity(), HotSpotListener {
@@ -35,10 +38,74 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
             setContentView(binding.contentView)
             onCreate()
             isAccelerometerEnabled = false
-            isInertiaEnabled = false
-            isZoomEnabled = false
+            isInertiaEnabled = true
+            isScrollingEnabled = true
+            minDistanceToEnableScrolling = 30
+            minDistanceToEnableDrawing = 1
+            inertiaInterval = 2f
+            isZoomEnabled = true
             isAcceleratedTouchScrollingEnabled = useAcceleratedTouchScrolling
         }
+        plManager.setListener(object : PLViewListener() {
+            override fun onDidClickHotspot(view: PLIView?, hotspot: PLIHotspot?, screenPoint: CGPoint?, scene3DPoint: PLPosition?) {
+                super.onDidClickHotspot(view, hotspot, screenPoint, scene3DPoint)
+                Log.i("plManager", "onDidClickHotspot")
+            }
+            override fun onDidEndZooming(view: PLIView?) {
+                super.onDidEndZooming(view)
+
+            }
+
+            override fun onDidBeginTransition(view: PLIView?, transition: PLITransition?) {
+                super.onDidBeginTransition(view, transition)
+                Log.i("plManager", "onDidBeginTransition")
+            }
+
+            override fun onDidStopTransition(view: PLIView?, transition: PLITransition?, progressPercentage: Int) {
+                super.onDidStopTransition(view, transition, progressPercentage)
+                Log.i("plManager", "onDidStopTransition")
+            }
+
+            override fun onDidEndTransition(view: PLIView?, transition: PLITransition?) {
+                super.onDidEndTransition(view, transition)
+                Log.i("plManager", "onDidEndTransition")
+            }
+
+            override fun onDidBeginTouching(view: PLIView?, touches: MutableList<UITouch>?, event: MotionEvent?) {
+                super.onDidBeginTouching(view, touches, event)
+                Log.i("plManager", "onDidBeginTouching")
+            }
+
+            override fun onDidBeginScrolling(view: PLIView?, startPoint: CGPoint?, endPoint: CGPoint?) {
+                super.onDidBeginScrolling(view, startPoint, endPoint)
+                Log.i("plManager", "onDidBeginScrolling")
+            }
+
+            override fun onDidEndScrolling(view: PLIView?, startPoint: CGPoint?, endPoint: CGPoint?) {
+                super.onDidEndScrolling(view, startPoint, endPoint)
+                Log.i("plManager", "onDidEndScrolling")
+            }
+
+            override fun onDidEndTouching(view: PLIView?, touches: MutableList<UITouch>?, event: MotionEvent?) {
+                super.onDidEndTouching(view, touches, event)
+                Log.i("plManager", "onDidEndTouching")
+            }
+
+            override fun onDidBeginInertia(view: PLIView?, startPoint: CGPoint?, endPoint: CGPoint?) {
+                super.onDidBeginInertia(view, startPoint, endPoint)
+                Log.i("plManager", "onDidBeginInertia")
+            }
+
+            override fun onDidEndInertia(view: PLIView?, startPoint: CGPoint?, endPoint: CGPoint?) {
+                super.onDidEndInertia(view, startPoint, endPoint)
+                Log.i("plManager", "onDidEndInertia")
+            }
+
+            override fun onDidRunInertia(view: PLIView?, startPoint: CGPoint?, endPoint: CGPoint?) {
+                super.onDidRunInertia(view, startPoint, endPoint)
+                Log.i("plManager", "onDidRunInertia")
+            }
+        })
         changePanorama(0)
         binding.button3.setOnClickListener {
             if (sensor) {
@@ -81,12 +148,10 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
         panorama.setImage(PLImage(image3D, false))
         var pitch = 5f
         var yaw = 0f
-        var zoomFactor = 0.7f
         if (currentIndex != -1) {
             plManager.panorama.camera?.apply {
                 pitch = this.pitch
                 yaw = this.yaw
-                zoomFactor = this.zoomFactor
             }
         }
         panorama.removeAllHotspots()
@@ -114,19 +179,23 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
         )
         panorama.addHotspot(plHotspot1)
         panorama.addHotspot(plHotspot2)
-        panorama.camera.lookAtAndZoomFactor(pitch, yaw, zoomFactor, false)
+        panorama.camera.setFov(100.0f, false)
+        panorama.camera.setFovRange(15.0f, 100.0f)
+        panorama.camera.lookAt(pitch, yaw, false)
         if (!useAcceleratedTouchScrolling) {
             // If not using the accelerated scrolling, increasing the camera's rotation sensitivity will allow the
             // image to pan faster with finger movement. 180f gives about a ~1:1 move sensitivity.
             // Higher will move the map faster
             // Range 1-270
-            panorama.camera.rotationSensitivity = 270f
+            panorama.camera.rotationSensitivity = 300f
+            panorama.camera.rotationSensitivityFactorInZoomScaleEnable = true
+            panorama.camera.rotationSensitivityFactorInZoomScale = 2f
         }
         plManager.panorama = panorama
         currentIndex = index
     }
 
     override fun onClick(identifier: Long) {
-        runOnUiThread { Toast.makeText(this@MainActivity, "HotSpotClicked! Id is-> $identifier", Toast.LENGTH_SHORT).show() }
+        Log.i("PLTouchStatusBegan","onClick")
     }
 }
