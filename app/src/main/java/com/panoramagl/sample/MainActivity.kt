@@ -17,7 +17,7 @@ import com.panoramagl.structs.PLPosition
 import com.panoramagl.transitions.PLITransition
 import com.panoramagl.utils.PLUtils
 
-class MainActivity : AppCompatActivity(), HotSpotListener {
+class MainActivity : AppCompatActivity(), HotSpotListener, PLTextureListener {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -48,7 +48,6 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
         }
 
 
-
         var pitch = 5f
         var yaw = 0f
         if (currentIndex != -1) {
@@ -75,6 +74,7 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
                 super.onDidClickHotspot(view, hotspot, screenPoint, scene3DPoint)
                 Log.i("plManager", "onDidClickHotspot")
             }
+
             override fun onDidEndZooming(view: PLIView?) {
                 super.onDidEndZooming(view)
 
@@ -137,8 +137,8 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
             } else {
                 plManager.startSensorialRotation()
             }
-            plManager.isSensorialRotationLeftRightEnabled=false
-            plManager.isSensorialRotationUpDownEnabled=true
+            plManager.isSensorialRotationLeftRightEnabled = false
+            plManager.isSensorialRotationUpDownEnabled = true
             sensor = !sensor
         }
         binding.button1.setOnClickListener { changePanorama(0) }
@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
         if (currentIndex == index)
             return
         val image3D = PLUtils.getBitmap(this, resourceIds[index])
-        panorama.setImage(PLImage(image3D, false))
+        panorama.setTexture(PLTexture(PLImage(image3D, false), this))
         panorama.removeAllHotspots()
         val hotSpotId: Long = 100
         val normalizedX = 500f / image3D.width
@@ -199,6 +199,14 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
     }
 
     override fun onClick(identifier: Long) {
-        Log.i("PLTouchStatusBegan","onClick")
+        Log.i("PLTouchStatusBegan", "onClick")
+    }
+
+    override fun didLoad(texture: PLITexture?) {
+        Log.i("PLTouchStatusBegan", "didLoad")
+    }
+
+    override fun didError(e: Throwable) {
+        Log.i("PLTouchStatusBegan", "error: " + e.message)
     }
 }
