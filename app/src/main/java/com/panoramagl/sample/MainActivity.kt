@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
     private var currentIndex = -1
     private var sensor = false
     private val resourceIds = intArrayOf(R.raw.sighisoara_sphere, R.raw.sighisoara_sphere_2)
-
+    val panorama = PLSphericalPanorama()
     private val useAcceleratedTouchScrolling = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +46,30 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
             isZoomEnabled = true
             isAcceleratedTouchScrollingEnabled = useAcceleratedTouchScrolling
         }
+
+
+
+        var pitch = 5f
+        var yaw = 0f
+        if (currentIndex != -1) {
+            plManager.panorama.camera?.apply {
+                pitch = this.pitch
+                yaw = this.yaw
+            }
+        }
+        panorama.camera.setFov(100.0f, false)
+        panorama.camera.setFovRange(15.0f, 100.0f)
+        panorama.camera.lookAt(pitch, yaw, false)
+        if (!useAcceleratedTouchScrolling) {
+            // If not using the accelerated scrolling, increasing the camera's rotation sensitivity will allow the
+            // image to pan faster with finger movement. 180f gives about a ~1:1 move sensitivity.
+            // Higher will move the map faster
+            // Range 1-270
+            panorama.camera.rotationSensitivity = 300f
+            panorama.camera.rotationSensitivityFactorInZoomScaleEnable = true
+            panorama.camera.rotationSensitivityFactorInZoomScale = 2f
+        }
+        plManager.panorama = panorama
         plManager.setListener(object : PLViewListener() {
             override fun onDidClickHotspot(view: PLIView?, hotspot: PLIHotspot?, screenPoint: CGPoint?, scene3DPoint: PLPosition?) {
                 super.onDidClickHotspot(view, hotspot, screenPoint, scene3DPoint)
@@ -144,16 +168,7 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
         if (currentIndex == index)
             return
         val image3D = PLUtils.getBitmap(this, resourceIds[index])
-        val panorama = PLSphericalPanorama()
         panorama.setImage(PLImage(image3D, false))
-        var pitch = 5f
-        var yaw = 0f
-        if (currentIndex != -1) {
-            plManager.panorama.camera?.apply {
-                pitch = this.pitch
-                yaw = this.yaw
-            }
-        }
         panorama.removeAllHotspots()
         val hotSpotId: Long = 100
         val normalizedX = 500f / image3D.width
@@ -179,19 +194,7 @@ class MainActivity : AppCompatActivity(), HotSpotListener {
         )
         panorama.addHotspot(plHotspot1)
         panorama.addHotspot(plHotspot2)
-        panorama.camera.setFov(100.0f, false)
-        panorama.camera.setFovRange(15.0f, 100.0f)
-        panorama.camera.lookAt(pitch, yaw, false)
-        if (!useAcceleratedTouchScrolling) {
-            // If not using the accelerated scrolling, increasing the camera's rotation sensitivity will allow the
-            // image to pan faster with finger movement. 180f gives about a ~1:1 move sensitivity.
-            // Higher will move the map faster
-            // Range 1-270
-            panorama.camera.rotationSensitivity = 300f
-            panorama.camera.rotationSensitivityFactorInZoomScaleEnable = true
-            panorama.camera.rotationSensitivityFactorInZoomScale = 2f
-        }
-        plManager.panorama = panorama
+
         currentIndex = index
     }
 
