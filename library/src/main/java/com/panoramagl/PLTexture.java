@@ -48,23 +48,28 @@ public class PLTexture extends PLObjectBase implements PLITexture {
      * init methods
      */
 
+    public PLTexture(PLIImage image, PLTextureListener listener) {
+        this(image, PLTextureColorFormat.PLTextureColorFormatUnknown, true, listener);
+    }
+
     public PLTexture(PLIImage image) {
-        this(image, PLTextureColorFormat.PLTextureColorFormatUnknown, true);
+        this(image, PLTextureColorFormat.PLTextureColorFormatUnknown, true, null);
     }
 
     public PLTexture(PLIImage image, boolean isRecycledByParent) {
-        this(image, PLTextureColorFormat.PLTextureColorFormatUnknown, isRecycledByParent);
+        this(image, PLTextureColorFormat.PLTextureColorFormatUnknown, isRecycledByParent, null);
     }
 
     public PLTexture(PLIImage image, PLTextureColorFormat colorFormat) {
-        this(image, colorFormat, true);
+        this(image, colorFormat, true, null);
     }
 
-    public PLTexture(PLIImage image, PLTextureColorFormat colorFormat, boolean isRecycledByParent) {
+    public PLTexture(PLIImage image, PLTextureColorFormat colorFormat, boolean isRecycledByParent, PLTextureListener listener) {
         super();
         mImage = image;
         mColorFormat = colorFormat;
         mIsRecycledByParent = isRecycledByParent;
+        mListener = listener;
     }
 
     @Override
@@ -199,6 +204,10 @@ public class PLTexture extends PLObjectBase implements PLITexture {
             if (mWidth > PLConstants.kTextureMaxSize || mHeight > PLConstants.kTextureMaxSize) {
                 PLLog.error("PLTexture::loadTexture", "Invalid texture size. The texture max size must be %d x %d and currently is %d x %d.", PLConstants.kTextureMaxSize, PLConstants.kTextureMaxSize, mWidth, mHeight);
                 this.recycleImage();
+                if (mListener != null) {
+                    mListener.didError(getNewError("Invalid texture size. The texture max size must be %d x %d and currently is %d x %d.",
+                            PLConstants.kTextureMaxSize, PLConstants.kTextureMaxSize, mWidth, mHeight));
+                }
                 return false;
             }
 
@@ -221,6 +230,9 @@ public class PLTexture extends PLObjectBase implements PLITexture {
             if (error != GL10.GL_NO_ERROR) {
                 PLLog.error("PLTexture::loadTexture", "glGetError #1 = (%d) %s ...", error, GLU.gluErrorString(error));
                 this.recycleImage();
+                if (mListener != null) {
+                    mListener.didError(getNewError("StreetView glGetError #1 = (%d) %s ...", error, GLU.gluErrorString(error)));
+                }
                 return false;
             }
 
@@ -230,6 +242,9 @@ public class PLTexture extends PLObjectBase implements PLITexture {
             if (error != GL10.GL_NO_ERROR) {
                 PLLog.error("PLTexture::loadTexture", "glGetError #2 = (%d) %s ...", error, GLU.gluErrorString(error));
                 this.recycleImage();
+                if (mListener != null) {
+                    mListener.didError(getNewError("StreetView glGetError #2 = (%d) %s ...", error, GLU.gluErrorString(error)));
+                }
                 return false;
             }
 
@@ -249,6 +264,9 @@ public class PLTexture extends PLObjectBase implements PLITexture {
             if (error != GL10.GL_NO_ERROR) {
                 PLLog.error("PLTexture::loadTexture", "glGetError #3 = (%d) %s ...", error, GLU.gluErrorString(error));
                 this.recycleImage();
+                if (mListener != null) {
+                    mListener.didError(getNewError("StreetView glGetError #3 = (%d) %s ...", error, GLU.gluErrorString(error)));
+                }
                 return false;
             }
 
@@ -260,14 +278,22 @@ public class PLTexture extends PLObjectBase implements PLITexture {
             if (gl instanceof IGLWrapper)
                 mGLWrapper = (IGLWrapper) gl;
 
-            if (mListener != null)
+            if (mListener != null) {
                 mListener.didLoad(this);
+            }
 
             return true;
         } catch (Throwable e) {
             PLLog.error("PLTexture::loadTexture", e);
+            if (mListener != null) {
+                mListener.didError(e);
+            }
         }
         return false;
+    }
+
+    private Throwable getNewError(String format, Object... args) {
+        return new Throwable(String.format(format, args));
     }
 
     /**
